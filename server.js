@@ -7,10 +7,17 @@ const { buildSchema } = require('graphql')
 
 const SongList = [
   { name: 'Rain is Falling', artist: 'ELO', album: 'Time', songId: 1 },
-  { name: 'Buildings Have Eyes', artist: 'ELO', ablum: 'Secret Messages', songId: 2 },
-  { name: 'Dont Bring Me Down', artist: 'ELO', ablum: 'Discovery', songId: 3 },
-  { name: 'Turn to Stone', artist: 'ELO', ablum: 'Out of the Blue', songId: 4 },
+  { name: 'Buildings Have Eyes', artist: 'ELO', album: 'Secret_Messages', songId: 2 },
+  { name: 'Dont Bring Me Down', artist: 'ELO', album: 'Discovery', songId: 3 },
+  { name: 'Turn to Stone', artist: 'ELO', album: 'Out_of_the_Blue', songId: 4 },
 ]
+
+const Albums = {
+  Time: "Time",
+  Secret_Messages: "Secret_Messages",
+  Discovery: "Discovery",
+  Out_of_the_Blue: "Out_of_the_Blue",
+};
 
 // Define the Schema
 const schema = buildSchema(`
@@ -22,11 +29,15 @@ type Query {
   getAbout: About
   allSongs: [Song!]!
   getSong(songId: Int!): Song
+  getSongCount: Int!
   firstSong: Song!
   lastSong: Song!
   getTime: Time
   getRandom(range: Int!): Int!
   getRoll(sides: Int!, rolls: Int!): Roll!
+  songsInRange(start: Int!, count: Int!): [Song]!
+  getSongByName(name: String!): Song
+  allAlbums: [Album!]!
 }
 
 type Roll {
@@ -37,9 +48,9 @@ type Roll {
 
 enum Album {
   Time
-  Secret Messages
+  Secret_Messages
   Discovery
-  Out of the Blue
+  Out_of_the_Blue
 }
 
 type Time {
@@ -51,7 +62,7 @@ type Time {
 type Song {
   name: String!
   artist: String!
-  album: Album!
+  album: Album
   songId: Int!
 }
 
@@ -92,6 +103,20 @@ const root = {
     }
 
     return { total, sides, rolls: rollArr }
+  },
+  getSongCount: () => {
+    return SongList.length
+  },
+  songsInRange: ({ start, count }) => {
+    return SongList.slice(start, start + count)
+  },
+  getSongByName: ({ name }) => {
+    for (song of SongList) {
+      if (song.name === name) return song
+    }
+  },
+  allAlbums: () => {
+    return Object.keys(Albums)
   }
 }
 
