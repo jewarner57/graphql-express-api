@@ -123,7 +123,7 @@ const root = {
   },
   getSongByName: ({ name }) => {
     for (song of SongList) {
-      if (song.name === name) return song
+      if (song.name.toLowerCase() === name.toLowerCase()) return song
     }
   },
   allAlbums: () => {
