@@ -24,6 +24,7 @@ const schema = buildSchema(`
 type Mutation {
 	addSong(name: String!, artist: String!, album: Album!): Song!
   updateSong(songId: Int!, name: String, artist: String, album: Album): Song
+  deleteSong(songId: Int!): Song
 }
 
 type Query {
@@ -144,8 +145,6 @@ const root = {
       }
     }
 
-    console.log(updateSongIndex)
-
     if (updateSongIndex === null) {
       return null
     }
@@ -159,11 +158,18 @@ const root = {
       album: album || updateSong.album
     }
 
-    console.log(updateSong)
-
     SongList[updateSongIndex] = updateSong
 
     return updateSong
+  },
+  deleteSong: ({ songId }) => {
+    for ([index, song] of SongList.entries()) {
+      if (song.songId === songId) {
+        SongList.splice(index, 1)
+        return song
+      }
+    }
+    return null
   }
 }
 
