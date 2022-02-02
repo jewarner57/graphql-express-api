@@ -21,8 +21,9 @@ const Albums = {
 
 // Define the Schema
 const schema = buildSchema(`
-type About {
-  message: String!
+type Mutation {
+	addSong(name: String!, artist: String!, album: Album!): Song!
+  updateSong(songId: Int!, name: String, artist: String, album: Album): Song
 }
 
 type Query {
@@ -38,6 +39,10 @@ type Query {
   songsInRange(start: Int!, count: Int!): [Song]!
   getSongByName(name: String!): Song
   allAlbums: [Album!]!
+}
+
+type About {
+  message: String!
 }
 
 type Roll {
@@ -77,7 +82,12 @@ const root = {
     return SongList
   },
   getSong: ({ songId }) => {
-    return SongList[songId]
+    for (song of SongList) {
+      if (song.songId === songId) {
+        return song
+      }
+    }
+    return null
   },
   firstSong: () => {
     return SongList[0]
@@ -117,6 +127,43 @@ const root = {
   },
   allAlbums: () => {
     return Object.keys(Albums)
+  },
+  addSong: ({ name, artist, album }) => {
+    let newSong = {
+      name, artist, album, songId: Math.round(Math.random() * 10000)
+    }
+    SongList.push(newSong)
+
+    return newSong
+  },
+  updateSong: ({ songId, name, artist, album }) => {
+    let updateSongIndex = null
+    for ([index, song] of SongList.entries()) {
+      if (song.songId === songId) {
+        updateSongIndex = index
+      }
+    }
+
+    console.log(updateSongIndex)
+
+    if (updateSongIndex === null) {
+      return null
+    }
+
+    updateSong = SongList[updateSongIndex]
+
+    updateSong = {
+      songId: updateSong.songId,
+      name: name || updateSong.name,
+      artist: artist || updateSong.artist,
+      album: album || updateSong.album
+    }
+
+    console.log(updateSong)
+
+    SongList[updateSongIndex] = updateSong
+
+    return updateSong
   }
 }
 
